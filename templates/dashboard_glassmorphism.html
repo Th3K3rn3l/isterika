@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isterika Panel - Dark Glassmorphism</title>
+    <link rel="icon" type="image/png" href="{{ secret_url_for('static', filename='logo.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* Dark Glassmorphism Theme */
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #1a1a1a 100%);
+            background-attachment: fixed;
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 111, 67, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Coral Accent Color */
+        .accent-coral {
+            color: #ff7043;
+        }
+
+        .bg-accent-coral {
+            background-color: #ff7043;
+        }
+
+        .border-accent-coral {
+            border-color: #ff7043;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-item {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 111, 67, 0.1);
+            border: 1px solid rgba(255, 111, 67, 0.3);
+            box-shadow: 0 0 20px rgba(255, 111, 67, 0.2);
+        }
+
+        .sidebar-item.active {
+            background: rgba(255, 111, 67, 0.15);
+            border: 1px solid rgba(255, 111, 67, 0.4);
+            box-shadow: 0 0 30px rgba(255, 111, 67, 0.3);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 120px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .toggle-switch.active {
+            background: rgba(255, 111, 67, 0.2);
+            border-color: #ff7043;
+            box-shadow: 0 0 40px rgba(255, 111, 67, 0.4);
+        }
+
+        .toggle-knob {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff7043, #ff8a65);
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(255, 111, 67, 0.5);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            left: 63px;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        /* Glow Effect */
+        .glow-coral {
+            box-shadow: 0 0 30px rgba(255, 111, 67, 0.3);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 111, 67, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 111, 67, 0.5);
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen text-white overflow-hidden" x-data="dashboard()">
+
+    <!-- Main Layout -->
+    <div class="flex h-screen">
+
+        <!-- Sidebar -->
+        <div class="sidebar flex flex-col items-center py-8 space-y-6">
+            <!-- Logo -->
+            <div class="sidebar-item active flex items-center justify-center mb-4">
+                <img src="{{ secret_url_for('static', filename='logo.png') }}" alt="Logo" class="w-8 h-8">
+            </div>
+
+            <!-- Dashboard -->
+            <div class="sidebar-item flex items-center justify-center" title="Dashboard">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+            </div>
+
+            <!-- Users -->
+            <div class="sidebar-item flex items-center justify-center" title="Users">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </div>
+
+            <!-- Analytics -->
+            <div class="sidebar-item flex items-center justify-center" title="Analytics">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </div>
+
+            <!-- Settings -->
+            <div class="sidebar-item flex items-center justify-center mt-auto" @click="window.location.href='{{ secret_url_for('settings') }}'" title="Settings">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+
+            <!-- Logout -->
+            <div class="sidebar-item flex items-center justify-center" @click="logout()" title="Logout">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-4xl font-bold text-white mb-2">VPN Dashboard</h1>
+                    <p class="text-white/50">Manage your Hysteria2 server</p>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="grid grid-cols-12 gap-6">
+
+                    <!-- Center Widget - Connection Status -->
+                    <div class="col-span-8">
+                        <div class="glass p-8">
+                            <div class="text-center">
+                                <h2 class="text-2xl font-bold mb-8">Connection Status</h2>
+
+                                <!-- 3D Shield Icon -->
+                                <div class="mb-8 flex justify-center">
+                                    <div class="relative">
+                                        <svg class="w-32 h-32 accent-coral" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div class="absolute inset-0 blur-2xl opacity-50 bg-accent-coral"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Toggle Switch -->
+                                <div class="flex justify-center mb-8">
+                                    <div class="toggle-switch" :class="{ 'active': serverStatus }" @click="toggleServer()">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+
+                                <p class="text-xl font-semibold mb-2" x-text="serverStatus ? 'Server Active' : 'Server Inactive'"></p>
+                                <p class="text-white/50" x-text="serverStatus ? 'All systems operational' : 'Click to activate'"></p>
+
+                                <!-- Stats Row -->
+                                <div class="grid grid-cols-3 gap-4 mt-8">
+                                    <div class="glass-card p-4">
+                                        <p class="text-white/50 text-sm mb-1">Active Users</p>
+                                        <p class="text-3xl font-bold accent-coral" x-text="stats.total_clients"></p>
+                                    </div>
+                                    <div class="glass-card p-4">
+                                        <p class="text-white/50 text-sm mb-1">Uptime</p>
+                                        <p class="text-3xl font-bold text-white">99.9%</p>
+                                    </div>
+                                    <div class="glass-card p-4">
+                                        <p class="text-white/50 text-sm mb-1">Bandwidth</p>
+                                        <p class="text-3xl font-bold text-white" x-text="stats.total_traffic"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Sessions Table -->
+                        <div class="glass p-6 mt-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold">Active Sessions</h3>
+                                <button @click="showAddModal = true" class="px-4 py-2 bg-accent-coral rounded-xl hover:shadow-lg hover:shadow-coral/30 transition-all">
+                                    + Add User
+                                </button>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-white/10">
+                                            <th class="text-left py-3 px-4 text-white/70 font-semibold text-sm">Username</th>
+                                            <th class="text-left py-3 px-4 text-white/70 font-semibold text-sm">Bandwidth</th>
+                                            <th class="text-left py-3 px-4 text-white/70 font-semibold text-sm">Expires</th>
+                                            <th class="text-right py-3 px-4 text-white/70 font-semibold text-sm">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="client in clients" :key="client.username">
+                                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center space-x-3">
+                                                        <div class="w-10 h-10 rounded-full bg-accent-coral/20 flex items-center justify-center">
+                                                            <span class="text-sm font-bold accent-coral" x-text="client.username.charAt(0).toUpperCase()"></span>
+                                                        </div>
+                                                        <span class="font-medium" x-text="client.username"></span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center space-x-2 text-sm">
+                                                        <span class="text-white/70" x-text="client.bandwidth_up || '∞'"></span>
+                                                        <span class="text-white/30">/</span>
+                                                        <span class="text-white/70" x-text="client.bandwidth_down || '∞'"></span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-white/70" x-text="client.expires_at"></td>
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center justify-end space-x-2">
+                                                        <button @click="showQRModal(client.username)" class="p-2 glass-card hover:bg-accent-coral/20 rounded-lg transition-all">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                                            </svg>
+                                                        </button>
+                                                        <button @click="deleteClient(client.username)" class="p-2 glass-card hover:bg-red-500/20 rounded-lg transition-all">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Analytics -->
+                    <div class="col-span-4 space-y-6">
+
+                        <!-- Protocol Distribution -->
+                        <div class="glass p-6">
+                            <h3 class="text-lg font-bold mb-4">Traffic Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="protocolChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Server Load -->
+                        <div class="glass p-6">
+                            <h3 class="text-lg font-bold mb-4">Server Load (7 Days)</h3>
+                            <div class="chart-container">
+                                <canvas id="loadChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add User Modal -->
+    <div x-show="showAddModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);">
+        <div class="glass p-8 max-w-md w-full" @click.away="showAddModal = false">
+            <h2 class="text-2xl font-bold mb-6">Add New User</h2>
+            <form @submit.prevent="addClient()">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-white/70 mb-2 text-sm">Username</label>
+                        <input type="text" x-model="newClient.username" required class="w-full px-4 py-3 glass-card rounded-xl text-white outline-none focus:border-accent-coral">
+                    </div>
+                    <div>
+                        <label class="block text-white/70 mb-2 text-sm">Expires At</label>
+                        <input type="date" x-model="newClient.expires_at" required class="w-full px-4 py-3 glass-card rounded-xl text-white outline-none focus:border-accent-coral">
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" class="flex-1 px-6 py-3 bg-accent-coral rounded-xl hover:shadow-lg transition-all font-semibold">
+                            Add User
+                        </button>
+                        <button type="button" @click="showAddModal = false" class="flex-1 px-6 py-3 glass-card rounded-xl hover:bg-white/10 transition-all">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const csrfToken = '{{ csrf_token() }}';
+
+        function fetchWithCSRF(url, options = {}) {
+            if (options.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method.toUpperCase())) {
+                options.headers = options.headers || {};
+                options.headers['X-CSRF-Token'] = csrfToken;
+            }
+            return fetch(url, options);
+        }
+
+        function dashboard() {
+            return {
+                serverStatus: true,
+                stats: {
+                    total_clients: 0,
+                    active_clients: 0,
+                    total_traffic: '0 GB'
+                },
+                clients: [],
+                showAddModal: false,
+                newClient: {
+                    username: '',
+                    expires_at: ''
+                },
+
+                async init() {
+                    await this.loadStats();
+                    await this.loadClients();
+                    this.initCharts();
+                    setInterval(() => this.loadStats(), 5000);
+                },
+
+                async loadStats() {
+                    try {
+                        const res = await fetch('/api/stats');
+                        this.stats = await res.json();
+                    } catch (e) {
+                        console.error('Failed to load stats:', e);
+                    }
+                },
+
+                async loadClients() {
+                    try {
+                        const res = await fetch('/api/clients');
+                        this.clients = await res.json();
+                    } catch (e) {
+                        console.error('Failed to load clients:', e);
+                    }
+                },
+
+                async addClient() {
+                    try {
+                        const res = await fetchWithCSRF('/api/clients', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(this.newClient)
+                        });
+                        if (res.ok) {
+                            this.showAddModal = false;
+                            this.newClient = { username: '', expires_at: '' };
+                            await this.loadClients();
+                        }
+                    } catch (e) {
+                        console.error('Failed to add client:', e);
+                    }
+                },
+
+                async deleteClient(username) {
+                    if (!confirm(`Delete user ${username}?`)) return;
+                    try {
+                        await fetchWithCSRF(`/api/clients/${username}`, { method: 'DELETE' });
+                        await this.loadClients();
+                    } catch (e) {
+                        console.error('Failed to delete client:', e);
+                    }
+                },
+
+                showQRModal(username) {
+                    window.open(`/api/clients/${username}/qr`, '_blank');
+                },
+
+                toggleServer() {
+                    this.serverStatus = !this.serverStatus;
+                },
+
+                logout() {
+                    window.location.href = '{{ secret_url_for('logout') }}';
+                },
+
+                initCharts() {
+                    // Protocol Distribution Chart
+                    const protocolCtx = document.getElementById('protocolChart').getContext('2d');
+                    new Chart(protocolCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['VLESS', 'Reality', 'Hysteria2'],
+                            datasets: [{
+                                data: [45, 30, 25],
+                                backgroundColor: [
+                                    'rgba(255, 112, 67, 0.8)',
+                                    'rgba(255, 138, 101, 0.8)',
+                                    'rgba(255, 171, 145, 0.8)'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { color: '#fff', padding: 15 }
+                                }
+                            }
+                        }
+                    });
+
+                    // Server Load Chart
+                    const loadCtx = document.getElementById('loadChart').getContext('2d');
+                    new Chart(loadCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Load %',
+                                data: [65, 59, 80, 81, 56, 55, 70],
+                                backgroundColor: 'rgba(255, 112, 67, 0.6)',
+                                borderColor: '#ff7043',
+                                borderWidth: 2,
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: { color: '#fff' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                },
+                                x: {
+                                    ticks: { color: '#fff' },
+                                    grid: { display: false }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>

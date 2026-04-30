@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isterika Panel</title>
+    <link rel="icon" type="image/png" href="{{ secret_url_for('static', filename='logo.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="{{ secret_url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Dark futuristic background */
+        @keyframes subtleGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        .gradient-bg {
+            background: #0a0e1a;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle animated particles */
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
+            animation: subtleGlow 8s ease-in-out infinite;
+        }
+
+        /* Premium dark glassmorphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-hover:hover {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px 0 rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        /* Futuristic gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        /* Pulse animation */
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        /* Stat cards */
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px 0 rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        /* Buttons */
+        .glass-button {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Input fields */
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Table rows */
+        .glass-row {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-row:hover {
+            background: rgba(15, 23, 42, 0.6);
+            transform: scale(1.005);
+        }
+
+        /* Modal backdrop */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Progress bars */
+        .glass-progress {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(5px);
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.4);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.6);
+        }
+
+        [x-cloak] { display: none !important; }
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-slate-100" x-data="dashboard({{ first_login }})">
+    <!-- First Login Password Change Modal -->
+    <div x-show="showFirstLoginModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 modal-backdrop">
+        <div class="glass rounded-3xl p-8 max-w-md w-full shadow-2xl">
+            <h3 class="text-2xl font-bold gradient-text mb-4">Welcome! Change Your Password</h3>
+            <p class="text-white/80 mb-6">For security reasons, please change your password from the default (admin123).</p>
+            <form @submit.prevent="changeFirstLoginPassword">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-white/70 mb-2 text-sm font-medium">New Password</label>
+                        <input type="password" x-model="firstLoginForm.new" required class="w-full px-4 py-3 glass-input rounded-xl text-white placeholder-white/40 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-white/70 mb-2 text-sm font-medium">Confirm New Password</label>
+                        <input type="password" x-model="firstLoginForm.confirm" required class="w-full px-4 py-3 glass-input rounded-xl text-white placeholder-white/40 outline-none">
+                    </div>
+                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold">
+                        Change Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <header class="glass sticky top-0 z-50 border-b border-white/10 shadow-xl">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-16 h-16 glass rounded-2xl p-2 hover:scale-110 transition-transform duration-300">
+                            <img src="{{ secret_url_for('static', filename='logo.png') }}" alt="Logo" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold gradient-text">Isterika</h1>
+                            <p class="text-xs text-white/60">Hysteria 2 Panel</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 px-4 py-2 glass rounded-xl">
+                        <div class="relative">
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                            <div class="absolute inset-0 w-3 h-3 rounded-full pulse-ring bg-green-400"></div>
+                        </div>
+                        <span class="text-sm font-medium text-white">Online</span>
+                    </div>
+                    <a href="{{ secret_url_for('settings') }}" class="px-4 py-2 glass-button rounded-xl transition-all duration-300 flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                    <a href="{{ secret_url_for('logout') }}" class="px-4 py-2 glass-button rounded-xl hover:bg-red-500/20 transition-all duration-300 flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span>Выход</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass glass-hover rounded-3xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                    </div>
+                </div>
+                <p class="text-white/60 text-sm mb-1 font-medium">CPU Usage</p>
+                <p class="text-4xl font-bold text-white mb-3" x-text="stats.cpu + '%'">0%</p>
+                <div class="h-2 glass-progress rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-500 rounded-full" :style="`width: ${stats.cpu}%`"></div>
+                </div>
+            </div>
+            <div class="glass glass-hover rounded-3xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                </div>
+                <p class="text-white/60 text-sm mb-1 font-medium">Memory Usage</p>
+                <p class="text-4xl font-bold text-white mb-3" x-text="stats.memory + '%'">0%</p>
+                <div class="h-2 glass-progress rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all duration-500 rounded-full" :style="`width: ${stats.memory}%`"></div>
+                </div>
+            </div>
+            <div class="glass glass-hover rounded-3xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                </div>
+                <p class="text-white/60 text-sm mb-1 font-medium">Total Users</p>
+                <p class="text-4xl font-bold text-white mb-3" x-text="clients.length">0</p>
+                <p class="text-xs text-green-300 font-medium">Active subscriptions</p>
+            </div>
+            <div class="glass glass-hover rounded-3xl p-6 stat-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                    </div>
+                </div>
+                <p class="text-white/60 text-sm mb-1 font-medium">Network Traffic</p>
+                <p class="text-4xl font-bold text-white mb-3" x-text="formatBytes(stats.network)">0 B</p>
+                <p class="text-xs text-orange-300 font-medium">Total transferred</p>
+            </div>
+        </div>
+
+        <!-- Speedtest Section -->
+        <div class="glass rounded-3xl p-6 mb-8 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold gradient-text">Network Speed Test</h2>
+                <button @click="runSpeedtest" :disabled="speedtestRunning" class="px-6 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+                    <svg class="w-5 h-5" :class="{'animate-spin': speedtestRunning}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span x-text="speedtestRunning ? 'Testing...' : 'Run Speed Test'"></span>
+                </button>
+            </div>
+            <div x-show="speedtestResult" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-input rounded-2xl p-5">
+                    <p class="text-white/60 text-sm mb-2 font-medium">Download Speed</p>
+                    <p class="text-4xl font-bold text-green-300" x-text="speedtestResult && speedtestResult.download ? speedtestResult.download + ' Mbps' : 'Testing...'"></p>
+                </div>
+                <div class="glass-input rounded-2xl p-5">
+                    <p class="text-white/60 text-sm mb-2 font-medium">Upload Speed</p>
+                    <p class="text-4xl font-bold text-blue-300" x-text="speedtestResult && speedtestResult.upload ? speedtestResult.upload + ' Mbps' : (speedtestResult && speedtestResult.download ? 'Testing...' : '-')"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold gradient-text">Users</h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="searchQuery"
+                            @input="filterClients"
+                            placeholder="Search users..."
+                            class="px-4 py-2 pl-10 glass-input rounded-xl text-white placeholder-white/40 outline-none w-64"
+                        >
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <button @click="showAddModal = true" class="px-6 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center space-x-2 font-semibold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <span>Add User</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/10">
+                            <th class="text-left py-4 px-4 text-white/70 font-semibold text-sm">Username</th>
+                            <th class="text-left py-4 px-4 text-white/70 font-semibold text-sm">Bandwidth</th>
+                            <th class="text-left py-4 px-4 text-white/70 font-semibold text-sm">Expires On</th>
+                            <th class="text-left py-4 px-4 text-white/70 font-semibold text-sm">Days Remaining</th>
+                            <th class="text-right py-4 px-4 text-white/70 font-semibold text-sm">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="client in filteredClients" :key="client.username">
+                            <tr class="glass-row">
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center shadow-lg">
+                                            <span class="text-sm font-bold text-white" x-text="client.username.charAt(0).toUpperCase()"></span>
+                                        </div>
+                                        <span class="font-medium text-white" x-text="client.username"></span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <div class="text-sm">
+                                        <div x-show="client.bandwidth_up && client.bandwidth_down" class="flex items-center space-x-3">
+                                            <div class="flex items-center space-x-1">
+                                                <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                                                </svg>
+                                                <span class="text-blue-400 font-medium" x-text="client.bandwidth_up"></span>
+                                            </div>
+                                            <div class="flex items-center space-x-1">
+                                                <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                                                </svg>
+                                                <span class="text-cyan-400 font-medium" x-text="client.bandwidth_down"></span>
+                                            </div>
+                                        </div>
+                                        <span x-show="!client.bandwidth_up || !client.bandwidth_down" class="text-white/40 text-xs">∞ Unlimited</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-4 text-white" x-text="client.expires_at"></td>
+                                <td class="py-4 px-4">
+                                    <span :class="getDaysRemainingClass(client.expires_at)" x-text="getDaysRemaining(client.expires_at)"></span>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button @click="showQRModal(client.username)" class="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-xl hover:bg-blue-500/30 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 flex items-center space-x-2 text-blue-400 font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                            <span>Connect</span>
+                                        </button>
+                                        <button @click="showEditModal(client)" class="px-4 py-2 glass-button rounded-xl transition-all duration-300 flex items-center space-x-2 text-white/80">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button @click="deleteClient(client.username)" class="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-xl hover:bg-red-500/30 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/20 transition-all duration-300 flex items-center space-x-2 text-red-400 font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            <span>Delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button @click="deleteClient(client.username)" class="px-4 py-2 glass-button hover:bg-red-500/20 rounded-xl transition-all duration-300 flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            <span>Delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr x-show="filteredClients.length === 0">
+                            <td colspan="5" class="py-8 text-center text-white/50">
+                                <span x-show="searchQuery">No users found matching "<span x-text="searchQuery"></span>"</span>
+                                <span x-show="!searchQuery">No users yet</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div x-show="showAddModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" @click.self="showAddModal = false">
+        <div class="glass rounded-3xl p-8 max-w-md w-full shadow-2xl" @click.stop>
+            <h3 class="text-2xl font-bold gradient-text mb-6">Add New User</h3>
+            <form @submit.prevent="addClient">
+                <div class="mb-4">
+                    <label class="block text-white/70 mb-2 text-sm font-medium">Username</label>
+                    <input type="text" x-model="newClient.username" required class="w-full px-4 py-3 glass-input rounded-xl text-white placeholder-white/40 outline-none">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-white/70 mb-2 text-sm font-medium">Expires On</label>
+                    <input type="date" x-model="newClient.expires_at" required class="w-full px-4 py-3 glass-input rounded-xl text-white outline-none">
+                </div>
+
+                <!-- Bandwidth Limits -->
+                <div class="mb-4 p-4 glass-input rounded-2xl border border-white/10">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-white font-semibold">Bandwidth Limits (Optional)</label>
+                        <button type="button" @click="newClient.unlimited = !newClient.unlimited" class="text-xs px-3 py-1 rounded-lg transition-all duration-300" :class="newClient.unlimited ? 'bg-green-400/20 text-green-300' : 'glass-button text-white/60'">
+                            <span x-show="!newClient.unlimited">Set Unlimited</span>
+                            <span x-show="newClient.unlimited">Set Limits</span>
+                        </button>
+                    </div>
+                    <div x-show="!newClient.unlimited" class="space-y-3">
+                        <div>
+                            <label class="block text-white/60 text-sm mb-1">Upload Speed</label>
+                            <div class="flex space-x-2">
+                                <input type="number" x-model="newClient.bandwidth_up_value" min="1" placeholder="100" class="flex-1 px-4 py-2 glass-input rounded-xl text-white placeholder-white/30 outline-none">
+                                <select x-model="newClient.bandwidth_up_unit" class="px-3 py-2 glass-input rounded-xl text-white outline-none">
+                                    <option value="mbps">Mbps</option>
+                                    <option value="gbps">Gbps</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-white/60 text-sm mb-1">Download Speed</label>
+                            <div class="flex space-x-2">
+                                <input type="number" x-model="newClient.bandwidth_down_value" min="1" placeholder="100" class="flex-1 px-4 py-2 glass-input rounded-xl text-white placeholder-white/30 outline-none">
+                                <select x-model="newClient.bandwidth_down_unit" class="px-3 py-2 glass-input rounded-xl text-white outline-none">
+                                    <option value="mbps">Mbps</option>
+                                    <option value="gbps">Gbps</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text-xs text-white/40">Leave empty for unlimited speed</p>
+                    </div>
+                    <div x-show="newClient.unlimited" class="text-center py-2">
+                        <span class="text-green-300 text-sm">✓ Unlimited bandwidth</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button type="button" @click="showAddModal = false" class="flex-1 px-6 py-3 glass-button rounded-xl transition-all duration-300">Cancel</button>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" @click.self="editModalOpen = false">
+        <div class="glass rounded-3xl p-8 max-w-md w-full shadow-2xl" @click.stop>
+            <h3 class="text-2xl font-bold gradient-text mb-6">Edit User</h3>
+            <form @submit.prevent="updateClient">
+                <div class="mb-4">
+                    <label class="block text-white/70 mb-2 text-sm font-medium">Username</label>
+                    <input type="text" x-model="editClient.username" disabled class="w-full px-4 py-3 glass-input rounded-xl text-white/50 outline-none cursor-not-allowed">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-white/70 mb-2 text-sm font-medium">New Expiration Date</label>
+                    <input type="date" x-model="editClient.expires_at" required class="w-full px-4 py-3 glass-input rounded-xl text-white outline-none">
+                </div>
+
+                <!-- Bandwidth Limits -->
+                <div class="mb-4 p-4 glass-input rounded-2xl border border-white/10">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-white font-semibold">Bandwidth Limits</label>
+                        <button type="button" @click="editClient.unlimited = !editClient.unlimited" class="text-xs px-3 py-1 rounded-lg transition-all duration-300" :class="editClient.unlimited ? 'bg-green-400/20 text-green-300' : 'glass-button text-white/60'">
+                            <span x-show="!editClient.unlimited">Set Unlimited</span>
+                            <span x-show="editClient.unlimited">Set Limits</span>
+                        </button>
+                    </div>
+                    <div x-show="!editClient.unlimited" class="space-y-3">
+                        <div>
+                            <label class="block text-white/60 text-sm mb-1">Upload Speed</label>
+                            <div class="flex space-x-2">
+                                <input type="number" x-model="editClient.bandwidth_up_value" min="1" placeholder="100" class="flex-1 px-4 py-2 glass-input rounded-xl text-white placeholder-white/30 outline-none">
+                                <select x-model="editClient.bandwidth_up_unit" class="px-3 py-2 glass-input rounded-xl text-white outline-none">
+                                    <option value="mbps">Mbps</option>
+                                    <option value="gbps">Gbps</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-white/60 text-sm mb-1">Download Speed</label>
+                            <div class="flex space-x-2">
+                                <input type="number" x-model="editClient.bandwidth_down_value" min="1" placeholder="100" class="flex-1 px-4 py-2 glass-input rounded-xl text-white placeholder-white/30 outline-none">
+                                <select x-model="editClient.bandwidth_down_unit" class="px-3 py-2 glass-input rounded-xl text-white outline-none">
+                                    <option value="mbps">Mbps</option>
+                                    <option value="gbps">Gbps</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div x-show="editClient.unlimited" class="text-center py-2">
+                        <span class="text-green-300 text-sm">✓ Unlimited bandwidth</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button type="button" @click="editModalOpen = false" class="flex-1 px-6 py-3 glass-button rounded-xl transition-all duration-300">Cancel</button>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+                        </button>
+                    </div>
+                    <div x-show="!editClient.unlimited" class="space-y-3">
+                        <div>
+                            <label class="block text-slate-400 text-sm mb-1">Upload Speed</label>
+                            <div class="flex space-x-2">
+                                <input type="number" x-model="editClient.bandwidth_up_value" min="1" placeholder="100" class="flex-1 px-4 py-2 bg-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                <select x-model="editClient.bandwidth_up_unit" class="px-3 py-2 bg-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="mbps">Mbps</option>
+                                    <option value="gbps">Gbps</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 text-sm mb-1">Download Speed</label>
+                            <div class="flex space-x-2">
+                                <input type="number" x-model="editClient.bandwidth_down_value" min="1" placeholder="100" class="flex-1 px-4 py-2 bg-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                <select x-model="editClient.bandwidth_down_unit" class="px-3 py-2 bg-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="mbps">Mbps</option>
+                                    <option value="gbps">Gbps</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div x-show="editClient.unlimited" class="text-center py-2">
+                        <span class="text-green-400 text-sm">✓ Unlimited bandwidth</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button type="button" @click="editModalOpen = false" class="flex-1 px-6 py-3 bg-slate-700 rounded-lg hover:bg-slate-600 transition">Cancel</button>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg hover:shadow-lg hover:scale-105 transition">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div x-show="showQR" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" @click.self="showQR = false">
+        <div class="glass rounded-3xl p-8 max-w-md w-full text-center shadow-2xl" @click.stop>
+            <h3 class="text-2xl font-bold gradient-text mb-6">Connection QR Code</h3>
+            <div class="bg-white p-4 rounded-2xl mb-4 inline-block cursor-pointer hover:scale-105 transition-transform duration-300 shadow-xl" @click="copyLink" title="Click to copy link">
+                <img :src="qrData.qr" alt="QR Code" class="w-64 h-64">
+            </div>
+            <p class="text-sm text-white/60 mb-4">Click QR code to copy connection link</p>
+            <div class="glass-input p-3 rounded-xl mb-4 break-all text-sm">
+                <code class="text-white/80" x-text="qrData.link"></code>
+            </div>
+            <button @click="showQR = false" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // CSRF token helper
+        const csrfToken = '{{ csrf_token() }}';
+
+        function fetchWithCSRF(url, options = {}) {
+            if (options.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method.toUpperCase())) {
+                options.headers = options.headers || {};
+                options.headers['X-CSRF-Token'] = csrfToken;
+            }
+            return fetch(url, options);
+        }
+
+        function dashboard(firstLogin) {
+            return {
+                stats: { cpu: 0, memory: 0, network: 0 },
+                clients: [],
+                filteredClients: [],
+                searchQuery: '',
+                showAddModal: false,
+                editModalOpen: false,
+                showQR: false,
+                showFirstLoginModal: firstLogin === 1,
+                newClient: {
+                    username: '',
+                    expires_at: '',
+                    bandwidth_up_value: '',
+                    bandwidth_up_unit: 'mbps',
+                    bandwidth_down_value: '',
+                    bandwidth_down_unit: 'mbps',
+                    unlimited: true
+                },
+                editClient: {
+                    username: '',
+                    expires_at: '',
+                    bandwidth_up_value: '',
+                    bandwidth_up_unit: 'mbps',
+                    bandwidth_down_value: '',
+                    bandwidth_down_unit: 'mbps',
+                    unlimited: false
+                },
+                qrData: { qr: '', link: '' },
+                firstLoginForm: { new: '', confirm: '' },
+                speedtestRunning: false,
+                speedtestResult: null,
+
+                init() {
+                    this.loadStats();
+                    this.loadClients();
+                    setInterval(() => this.loadStats(), 5000);
+                    setInterval(() => this.loadClients(), 10000);
+                },
+
+                async loadStats() {
+                    try {
+                        const res = await fetch('/api/stats');
+                        this.stats = await res.json();
+                    } catch (e) {
+                        console.error('Failed to load stats:', e);
+                    }
+                },
+
+                async loadClients() {
+                    try {
+                        const res = await fetch('/api/clients');
+                        this.clients = await res.json();
+                        this.filterClients();
+                    } catch (e) {
+                        console.error('Failed to load clients:', e);
+                    }
+                },
+
+                filterClients() {
+                    if (!this.searchQuery.trim()) {
+                        this.filteredClients = this.clients;
+                        return;
+                    }
+
+                    const query = this.searchQuery.toLowerCase().trim();
+                    this.filteredClients = this.clients.filter(client =>
+                        client.username.toLowerCase().includes(query)
+                    );
+                },
+
+                async addClient() {
+                    try {
+                        const payload = {
+                            username: this.newClient.username,
+                            expires_at: this.newClient.expires_at
+                        };
+
+                        // Add bandwidth limits if not unlimited
+                        if (!this.newClient.unlimited && this.newClient.bandwidth_up_value && this.newClient.bandwidth_down_value) {
+                            payload.bandwidth_up = `${this.newClient.bandwidth_up_value} ${this.newClient.bandwidth_up_unit}`;
+                            payload.bandwidth_down = `${this.newClient.bandwidth_down_value} ${this.newClient.bandwidth_down_unit}`;
+                        }
+
+                        const res = await fetchWithCSRF('/api/clients', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.showAddModal = false;
+                            this.newClient = {
+                                username: '',
+                                expires_at: '',
+                                bandwidth_up_value: '',
+                                bandwidth_up_unit: 'mbps',
+                                bandwidth_down_value: '',
+                                bandwidth_down_unit: 'mbps',
+                                unlimited: true
+                            };
+                            this.loadClients();
+                        } else {
+                            alert(data.error || 'Failed to add user');
+                        }
+                    } catch (e) {
+                        alert('Failed to add user');
+                    }
+                },
+
+                async deleteClient(username) {
+                    if (!confirm(`Delete user ${username}?`)) return;
+                    try {
+                        const res = await fetchWithCSRF(`/api/clients/${username}`, { method: 'DELETE' });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.loadClients();
+                        }
+                    } catch (e) {
+                        alert('Failed to delete user');
+                    }
+                },
+
+                showEditModal(client) {
+                    // Parse bandwidth values if they exist
+                    let upValue = '', upUnit = 'mbps', downValue = '', downUnit = 'mbps', unlimited = true;
+
+                    if (client.bandwidth_up && client.bandwidth_down) {
+                        const upParts = client.bandwidth_up.split(' ');
+                        const downParts = client.bandwidth_down.split(' ');
+
+                        if (upParts.length === 2) {
+                            upValue = upParts[0];
+                            upUnit = upParts[1].toLowerCase();
+                        }
+                        if (downParts.length === 2) {
+                            downValue = downParts[0];
+                            downUnit = downParts[1].toLowerCase();
+                        }
+                        unlimited = false;
+                    }
+
+                    this.editClient = {
+                        username: client.username,
+                        expires_at: client.expires_at,
+                        bandwidth_up_value: upValue,
+                        bandwidth_up_unit: upUnit,
+                        bandwidth_down_value: downValue,
+                        bandwidth_down_unit: downUnit,
+                        unlimited: unlimited
+                    };
+                    this.editModalOpen = true;
+                },
+
+                async updateClient() {
+                    try {
+                        // Update expiration date
+                        const expiresRes = await fetchWithCSRF(`/api/clients/${this.editClient.username}/expires`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ expires_at: this.editClient.expires_at })
+                        });
+                        const expiresData = await expiresRes.json();
+
+                        if (!expiresData.success) {
+                            alert(expiresData.error || 'Failed to update expiration date');
+                            return;
+                        }
+
+                        // Update bandwidth limits
+                        let bandwidth_up = null;
+                        let bandwidth_down = null;
+
+                        if (!this.editClient.unlimited && this.editClient.bandwidth_up_value && this.editClient.bandwidth_down_value) {
+                            bandwidth_up = `${this.editClient.bandwidth_up_value} ${this.editClient.bandwidth_up_unit}`;
+                            bandwidth_down = `${this.editClient.bandwidth_down_value} ${this.editClient.bandwidth_down_unit}`;
+                        }
+
+                        const bandwidthRes = await fetchWithCSRF(`/api/clients/${this.editClient.username}/bandwidth`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                bandwidth_up: bandwidth_up,
+                                bandwidth_down: bandwidth_down
+                            })
+                        });
+                        const bandwidthData = await bandwidthRes.json();
+
+                        if (bandwidthData.success) {
+                            this.editModalOpen = false;
+                            this.loadClients();
+                        } else {
+                            alert(bandwidthData.error || 'Failed to update bandwidth');
+                        }
+                    } catch (e) {
+                        alert('Failed to update user');
+                    }
+                },
+
+                async showQRModal(username) {
+                    try {
+                        const res = await fetch(`/api/clients/${username}/qr`);
+                        this.qrData = await res.json();
+                        this.showQR = true;
+                    } catch (e) {
+                        alert('Failed to generate QR code');
+                    }
+                },
+
+                async changeFirstLoginPassword() {
+                    if (this.firstLoginForm.new !== this.firstLoginForm.confirm) {
+                        alert('New passwords do not match');
+                        return;
+                    }
+
+                    try {
+                        const res = await fetchWithCSRF('/api/settings/password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                current_password: 'admin123',
+                                new_password: this.firstLoginForm.new
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            alert('Password changed successfully!');
+                            this.showFirstLoginModal = false;
+                            this.firstLoginForm = { new: '', confirm: '' };
+                        } else {
+                            alert(data.error || 'Failed to change password');
+                        }
+                    } catch (e) {
+                        alert('Failed to change password');
+                    }
+                },
+
+                async runSpeedtest() {
+                    this.speedtestRunning = true;
+                    this.speedtestResult = { download: null, upload: null };
+
+                    try {
+                        // Start speedtest
+                        const startRes = await fetchWithCSRF('/api/speedtest', { method: 'POST' });
+                        const startData = await startRes.json();
+
+                        if (!startData.success) {
+                            alert('Failed to start speedtest: ' + (startData.error || 'Unknown error'));
+                            this.speedtestRunning = false;
+                            return;
+                        }
+
+                        // Poll for results
+                        const pollInterval = setInterval(async () => {
+                            try {
+                                const statusRes = await fetch('/api/speedtest/status');
+                                const statusData = await statusRes.json();
+
+                                if (statusData.download) {
+                                    this.speedtestResult.download = statusData.download;
+                                }
+                                if (statusData.upload) {
+                                    this.speedtestResult.upload = statusData.upload;
+                                }
+
+                                if (statusData.error) {
+                                    alert('Speedtest error: ' + statusData.error);
+                                    clearInterval(pollInterval);
+                                    this.speedtestRunning = false;
+                                }
+
+                                // If download is done but upload not started, start upload
+                                if (statusData.download && !statusData.upload && !statusData.running) {
+                                    const uploadRes = await fetchWithCSRF('/api/speedtest/upload', { method: 'POST' });
+                                    const uploadData = await uploadRes.json();
+                                    if (!uploadData.success) {
+                                        alert('Failed to start upload test: ' + (uploadData.error || 'Unknown error'));
+                                        clearInterval(pollInterval);
+                                        this.speedtestRunning = false;
+                                    }
+                                }
+
+                                // If both tests complete, stop polling
+                                if (statusData.download && statusData.upload && !statusData.running) {
+                                    clearInterval(pollInterval);
+                                    this.speedtestRunning = false;
+                                }
+                            } catch (e) {
+                                console.error('Polling error:', e);
+                            }
+                        }, 1000);
+
+                    } catch (e) {
+                        alert('Failed to run speedtest');
+                        this.speedtestResult = null;
+                        this.speedtestRunning = false;
+                    }
+                },
+
+                async copyLink() {
+                    try {
+                        await navigator.clipboard.writeText(this.qrData.link);
+                        alert('Link copied to clipboard!');
+                    } catch (e) {
+                        alert('Failed to copy link');
+                    }
+                },
+
+                getDaysRemaining(expiresAt) {
+                    const today = new Date();
+                    const expiry = new Date(expiresAt);
+                    const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+
+                    if (diff < 0) return 'Expired';
+                    if (diff === 0) return 'Expires today';
+                    if (diff === 1) return '1 day left';
+                    return `${diff} days left`;
+                },
+
+                getDaysRemainingClass(expiresAt) {
+                    const today = new Date();
+                    const expiry = new Date(expiresAt);
+                    const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+
+                    if (diff < 0) return 'text-red-400 font-semibold';
+                    if (diff <= 3) return 'text-orange-400 font-semibold';
+                    if (diff <= 7) return 'text-yellow-400';
+                    return 'text-green-400';
+                },
+
+                formatBytes(bytes) {
+                    if (bytes === 0) return '0 B';
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+                }
+            }
+        }
+    </script>
+</body>
+</html>

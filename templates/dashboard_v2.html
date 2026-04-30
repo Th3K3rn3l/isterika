@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isterika Panel - Панель управления</title>
+    <link rel="icon" type="image/png" href="{{ secret_url_for('static', filename='logo.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #1a1a1a 100%);
+            background-attachment: fixed;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 111, 67, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .accent-coral {
+            color: #ff7043;
+        }
+
+        .bg-accent-coral {
+            background-color: #ff7043;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-item {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 111, 67, 0.1);
+            border: 1px solid rgba(255, 111, 67, 0.3);
+            box-shadow: 0 0 20px rgba(255, 111, 67, 0.2);
+        }
+
+        .sidebar-item.active {
+            background: rgba(255, 111, 67, 0.15);
+            border: 1px solid rgba(255, 111, 67, 0.4);
+            box-shadow: 0 0 30px rgba(255, 111, 67, 0.3);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 111, 67, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 111, 67, 0.5);
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen text-white overflow-hidden" x-data="dashboard()">
+
+    <div class="flex h-screen">
+
+        <!-- Sidebar -->
+        <div class="sidebar flex flex-col items-center py-8 space-y-6">
+            <div class="sidebar-item active flex items-center justify-center mb-4">
+                <img src="{{ secret_url_for('static', filename='logo.png') }}" alt="Logo" class="w-8 h-8">
+            </div>
+
+            <div class="sidebar-item active flex items-center justify-center" title="Панель управления">
+                <svg class="w-6 h-6 accent-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+            </div>
+
+            <div class="sidebar-item flex items-center justify-center" @click="window.location.href='{{ secret_url_for('users') }}'" title="Пользователи">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </div>
+
+            <div class="sidebar-item flex items-center justify-center mt-auto" @click="window.location.href='{{ secret_url_for('settings') }}'" title="Настройки">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+
+            <div class="sidebar-item flex items-center justify-center" @click="logout()" title="Выход">
+                <svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-hidden p-8">
+            <div class="h-full flex flex-col">
+
+                <div class="mb-6">
+                    <h1 class="text-4xl font-bold text-white mb-2">Панель управления Hysteria2</h1>
+                    <p class="text-white/50">Мониторинг и статистика сервера</p>
+                </div>
+
+                <div class="flex-1 grid grid-cols-12 gap-6 overflow-hidden">
+
+                    <!-- Center - Server Status -->
+                    <div class="col-span-8 flex flex-col space-y-6 overflow-hidden">
+                        <div class="glass p-8 flex-shrink-0">
+                            <div class="text-center">
+                                <h2 class="text-2xl font-bold mb-6">Статус сервера</h2>
+
+                                <div class="mb-6 flex justify-center">
+                                    <div class="relative">
+                                        <svg class="w-24 h-24 accent-coral" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div class="absolute inset-0 blur-2xl opacity-50 bg-accent-coral"></div>
+                                    </div>
+                                </div>
+
+                                <p class="text-xl font-semibold mb-2 accent-coral">Сервер активен</p>
+                                <p class="text-white/50">Все системы работают нормально</p>
+
+                                <div class="grid grid-cols-3 gap-4 mt-6">
+                                    <div class="glass-card p-4">
+                                        <p class="text-white/50 text-sm mb-1">Всего пользователей</p>
+                                        <p class="text-3xl font-bold accent-coral" x-text="stats.total_clients"></p>
+                                    </div>
+                                    <div class="glass-card p-4">
+                                        <p class="text-white/50 text-sm mb-1">Активных</p>
+                                        <p class="text-3xl font-bold text-white" x-text="stats.active_clients"></p>
+                                    </div>
+                                    <div class="glass-card p-4">
+                                        <p class="text-white/50 text-sm mb-1">Трафик</p>
+                                        <p class="text-2xl font-bold text-white" x-text="stats.total_traffic"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass p-6 flex-1">
+                            <!-- Зарезервировано для будущих функций -->
+                        </div>
+                    </div>
+
+                    <!-- Right - Analytics -->
+                    <div class="col-span-4 flex flex-col space-y-6 overflow-hidden">
+
+                        <div class="glass p-6 flex-shrink-0">
+                            <h3 class="text-lg font-bold mb-4">Трафик по дням (7 дней)</h3>
+                            <div class="chart-container">
+                                <canvas id="trafficChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="glass p-6 flex-1 overflow-hidden flex flex-col">
+                            <h3 class="text-lg font-bold mb-4">Рост пользователей</h3>
+                            <div class="flex-1 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-6xl font-bold accent-coral mb-2" x-text="stats.total_clients"></p>
+                                    <p class="text-white/50">Всего пользователей</p>
+                                    <div class="mt-4 flex items-center justify-center space-x-2">
+                                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                        </svg>
+                                        <span class="text-green-400 font-semibold" x-text="stats.active_clients + ' активных'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const csrfToken = '{{ csrf_token() }}';
+
+        function dashboard() {
+            return {
+                stats: {
+                    total_clients: 0,
+                    active_clients: 0,
+                    total_traffic: '0 GB'
+                },
+
+                async init() {
+                    await this.loadStats();
+                    this.initCharts();
+                    setInterval(() => this.loadStats(), 5000);
+                },
+
+                async loadStats() {
+                    try {
+                        const res = await fetch('/api/stats');
+                        this.stats = await res.json();
+                    } catch (e) {
+                        console.error('Failed to load stats:', e);
+                    }
+                },
+
+                logout() {
+                    window.location.href = '{{ secret_url_for('logout') }}';
+                },
+
+                initCharts() {
+                    const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+                    new Chart(trafficCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                            datasets: [{
+                                label: 'Трафик (GB)',
+                                data: [12, 19, 15, 25, 22, 18, 24],
+                                backgroundColor: 'rgba(255, 112, 67, 0.6)',
+                                borderColor: '#ff7043',
+                                borderWidth: 2,
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { color: '#fff' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                },
+                                x: {
+                                    ticks: { color: '#fff' },
+                                    grid: { display: false }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>

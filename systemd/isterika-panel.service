@@ -1,0 +1,16 @@
+[Unit]
+Description=Isterika Panel - Hysteria 2 Management
+After=network.target hysteria-server.service
+Wants=hysteria-server.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/isterika
+Environment="PATH=/opt/isterika/venv/bin"
+ExecStart=/opt/isterika/venv/bin/python /opt/isterika/app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
